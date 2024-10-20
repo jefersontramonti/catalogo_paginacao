@@ -32,6 +32,7 @@ public class CategoryResource {
         this.categoryService = categoryService;
     }
 
+    @Operation(summary = "Get all categories")
     @GetMapping
     public ResponseEntity<Page<CategoryDTO>> findAll(
             @RequestParam(value = "name", required = false) String name,

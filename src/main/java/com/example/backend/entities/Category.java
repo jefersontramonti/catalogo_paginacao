@@ -3,12 +3,14 @@ package com.example.backend.entities;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.Instant;
 import java.util.Objects;
 
 @Entity
 @Table(name = "categories")
+@EntityListeners(AuditingEntityListener.class)
 public class Category {
 
     @Id
@@ -27,19 +29,11 @@ public class Category {
     private Instant updatedAt;
 
     public Category() {
-        // Construtor padrão protegido necessário para JPA
+        // Construtor padrão necessário para JPA
     }
 
     public Category(String name) {
         setName(name);
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
     }
 
     public Long getId() {
@@ -60,17 +54,31 @@ public class Category {
         }
     }
 
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.createdAt == null) {
+            this.createdAt = Instant.now();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Category)) return false;
-        Category category = (Category) o;
+        if (!(o instanceof Category category)) return false;
         return Objects.equals(getId(), category.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getId());
+        return Objects.hash(getId());
     }
 
     @Override
@@ -78,6 +86,8 @@ public class Category {
         return "Category{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
                 '}';
     }
 }
